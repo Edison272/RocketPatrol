@@ -48,9 +48,9 @@ class Play extends Phaser.Scene {
         //clock
         this.gameOver = false;
         scoreConfig.fixedWidth = 0
-        this.clock = this.time.delayedCall(60000, () => {
+        this.clock = this.time.delayedCall(game.settings.gameTimer, () => {
             this.add.text(game.config.width/2, game.config.height/2, 'GAME OVER', scoreConfig).setOrigin(0.5)
-            this.add.text(game.config.width/2, game.config.height/2 + 64, 'Press (R) to Restart', scoreConfig).setOrigin(0.5)
+            this.add.text(game.config.width/2, game.config.height/2 + 64, 'Press (R) to Restart or < for menu', scoreConfig).setOrigin(0.5)
             this.gameOver = true
         }, null, this)
     }
@@ -59,6 +59,9 @@ class Play extends Phaser.Scene {
         if(this.gameOver && Phaser.Input.Keyboard.JustDown(keyRESET)) {
             this.scene.restart()
         }
+        if (this.gameOver && Phaser.Input.Keyboard.JustDown(keyLEFT)) {
+            this.scene.start("menuScene")
+          }
 
         this.starfield.tilePositionX -= 4
         if(!this.gameOver) {
@@ -100,7 +103,8 @@ class Play extends Phaser.Scene {
         ship.alpha = 0
         // create explosion sprite at ship's position
         let boom = this.add.sprite(ship.x, ship.y, 'explosion').setOrigin(0, 0);
-        boom.anims.play('explode')             // play explode animation
+        this.sound.play('sfx-explosion')        //boom sound
+        boom.anims.play('explode')             // play explode 
         boom.on('animationcomplete', () => {   // callback after anim completes
           ship.reset()                         // reset ship position
           ship.alpha = 1                       // make ship visible again
